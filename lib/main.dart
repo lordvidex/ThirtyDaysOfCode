@@ -1,34 +1,28 @@
-import 'dart:math';
-
-int combination(int n, int r) {
-  if (n == 0 || r == 0) {
-    return 1;
-  }
-  int x = 1; //numerator 
-  int d = 1; //denominator
-  for (int i = max(r, n - r) + 1, j = 1; i <= n; i++, j++) {
-    x *= i;
-    d *= j;
-  }
-  x ~/= d;
-  return x;
-}
-
-void pascalTriangle(int numberOfRows) {
-  //Instead of looping and recreating arrays.. we can simply use Combinations to
-  //generate the fields in each row
-  for (int i = 0; i < numberOfRows; i++) {
-    List<int> arr = [];
-    int count = i;
-    while (count >= 0) {
-      arr.add(combination(i, count));
-      count--;
+//Decided to go OOP like Dart should be.. D:)
+class Triangle{
+  final num _lengthA;
+  final num _lengthB;
+  final num _lengthC;
+  Triangle(this._lengthA,this._lengthB,this._lengthC);
+  String get triangleType{
+    List<String> _result = [];
+    if(_lengthA==_lengthB||_lengthB==_lengthC||_lengthA==_lengthC){
+      _result.add('Isosceles');
+      if(_lengthA==_lengthB&&_lengthA==_lengthC){
+        _result.add('Equilateral');
+      }
+    }else{
+      _result.add('Scalene');
     }
-    print(arr.join(' '));
+    return _result.join(' and ')+' Triangle';
   }
 }
 
-void main() {
-  int numberOfRows = 10;
-  pascalTriangle(numberOfRows);
+void main(){
+  Triangle myFirstTriangle = Triangle(20,20,20);
+  Triangle mySecondTriangle = Triangle(20,20,30);
+  Triangle myThirdTriangle = Triangle(10,13,14);
+  print(myFirstTriangle.triangleType);
+  print(mySecondTriangle.triangleType);
+  print(myThirdTriangle.triangleType);
 }
