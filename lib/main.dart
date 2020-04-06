@@ -1,76 +1,101 @@
-//Banks database containing all created accts both active and inactive
-List<BankAccount> _bankDB = [];
-BankAccount myBankAccount(String accountNumber){
-  //function that checks if acct exists in DB else create new acct
-  var hiddenAccNumber =  List.generate(accountNumber.length-4,(_)=>'*').join("")+accountNumber.substring(accountNumber.length-4);
-    
-  try{
-  var x = _bankDB.firstWhere((b)=>b.accountNumber==accountNumber);
-    print('Account $hiddenAccNumber active....');
-    return x;
-  }catch(e){
-    //Error is thrown when account does not exists in database hence, 
-    //a new acct is created
-  _bankDB.add(BankAccount(accountNumber));
-    print('Account $hiddenAccNumber active....');
-  return _bankDB.last;
-  }
-}
-class BankAccount{
-  final String accountNumber;
-  bool isActive=true;
-  num _balance=0;
-  //Constructor creates a new BankAccount if none
-  BankAccount(this.accountNumber);
-  
-  //Balance enquiry
- void balanceEnquiry()=>print(isActive?'Account Balance: \$$_balance':'Account is either inactive or closed. Report case to the nearest XYZ Bank branch');
-  
-  //Withdraw
-  void withdraw(num amount){
-    if(!isActive){
-      print('Account is either inactive or closed. Report case to the nearest XYZ Bank branch');
-      return;
-    }
-    if(amount>_balance)print('Insufficient Balance\nOperation failed');else{
-    _balance-=amount;
-    print('\$$amount debited.');
-    balanceEnquiry();
-    }
-  }
-  
-  //Deposit
-  void deposit(num amount){
-    if(!isActive){
-      print('Account is either inactive or closed. Report case to the nearest XYZ Bank branch');
-      return;
-    }
-    _balance+=amount;
-    print('\$$amount deposited');
-    balanceEnquiry();
-  }
-  ///close or disable acct
-  void close(){
-    isActive = false;
-    print('Account $accountNumber has been closed and cannot be operated upon.');
-  }
-  
+///***************append function
+List<dynamic> append(List a, List b){
+  return a+b;
 }
 
+///************concatenate function
+class VarLists<T>{
+  List<dynamic> merger(List x){
+    List merges = [];
+    for(var a in x)merges+=a;
+    return merges;
+  }
+  @override
+  dynamic noSuchMethod(Invocation inv){
+    return merger(inv.positionalArguments);
+  }
+}
+dynamic concatenate = VarLists();
 
+///****************filter function
 
+/* using iterable method
+ Iterable<dynamic> filter(bool Function(dynamic) predicate, List<dynamic>list) sync*{
+   for(var x in list) {
+     if(predicate(x))yield x;
+   }
+ }
+*/
 
-void main(){
-  var myAccount = myBankAccount('1345657798');
-  myAccount.balanceEnquiry();
-  print('.................................');
-  myAccount.deposit(10000);
-  print('.................................');
-  myAccount.withdraw(2000);
-  print('.................................');
-  myAccount.close();
-  print('.................................');
-  //still the same account because of unique accountNumber
-  var anotherAccount = myBankAccount('1345657798');
-  anotherAccount.balanceEnquiry();
+//using list method
+List<dynamic> filter(bool Function(dynamic) predicate, List<dynamic> list){
+  List as = [];
+  for(var x in list) {
+    if(predicate(x))as+=[x];
+  }
+  return as;
+}
+
+//****************length function
+int length(List list){
+  var count= 0;
+  for(var x in list)count++;
+  return count;
+}
+
+//*****************map function
+//BONUS tinz
+/* using iterable method
+ Iterable<dynamic> map(dynamic Function(dynamic) func, List<dynamic>list) sync*{
+   for(var x in list) {
+     yield(func(x));
+   }
+ }
+ //DONT FORGET TO USE .toList() if Iterable method is preferred
+*/
+
+List<dynamic> map(dynamic Function(dynamic) func, List<dynamic> list){
+  List as = [];
+  for(var x in list)as+=[func(x)];
+  return as;
+}
+
+//******************reverse
+List<dynamic> reverse(List a){
+  var count = 0;
+  for(var x in a)count++;
+  for(int i = 0;i<count~/2;i++){
+    var temp = a[i];
+    a[i] = a[-1+count-i];
+    a[count-i-1] = temp;
+  }
+  return a;
+}
+
+void main() {
+  List a = [1,2,3,4];
+  List b = ['a','b','c','d'];
+  
+  //append
+  List appended = append(a,b);
+  print(appended);
+  
+  //concatenate
+  var conc = concatenate(a,b,[1,5],[12,3456,],['a',"s",12.54,'a']);
+  print(conc);
+  
+  //filter
+  List filtered = filter((x)=>x.runtimeType==int,appended);
+  print(filtered);
+  
+  //length
+  print(length(a));
+  
+  //map
+  List maps = map((x)=>x*x,a);
+  print(maps);
+  
+  //reverse
+  List reverser = reverse(appended);
+  print(reverser);
 }
