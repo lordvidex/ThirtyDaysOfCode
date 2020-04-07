@@ -1,101 +1,65 @@
-///***************append function
-List<dynamic> append(List a, List b){
-  return a+b;
-}
+import 'package:flutter/material.dart';
 
-///************concatenate function
-class VarLists<T>{
-  List<dynamic> merger(List x){
-    List merges = [];
-    for(var a in x)merges+=a;
-    return merges;
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Press Me na',
+      debugShowCheckedModeBanner: false,
+      home: FirstPage(),
+    );
+  }
+}
+class FirstPage extends StatefulWidget{
+  _FirstPageState createState()=>_FirstPageState();
+}
+class _FirstPageState extends State<FirstPage>{
+  var x = 0;
+   List<Color> colors = const [
+                 Color(0xFF0D47A1),
+                 Color(0xFF1976D2),
+                 Color(0xFF42A5F5),
+      ];
+  List<Color> reverse,color;
+  initState(){
+    color = colors;
+    reverse = colors.reversed.toList();
+    super.initState();
   }
   @override
-  dynamic noSuchMethod(Invocation inv){
-    return merger(inv.positionalArguments);
+  Widget build(BuildContext context){
+    Widget myButton(){
+      return InkWell(
+        borderRadius: BorderRadius.circular(30),
+           onHover: (yes)=>setState((){
+             color = yes?reverse:colors;
+           
+           }),
+           onTap: (){
+            //visual app feedback
+          setState((){x++;});
+            //Output to console
+        print('Button Pressed $x times');
+      },
+          child: Container(
+        padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: color),
+          borderRadius: BorderRadius.circular(30),
+        ),
+         child:Text('Press Me'),
+         ),    
+     );
+    }
+    return Scaffold(
+      appBar: AppBar(title:Text('Simple Presser'),),
+      body:Center(child: SingleChildScrollView(child: Column(children:[
+        Text('Button Pressed $x times'),
+        SizedBox(height: 20),
+        myButton(),
+      ])),
+    ));
   }
-}
-dynamic concatenate = VarLists();
-
-///****************filter function
-
-/* using iterable method
- Iterable<dynamic> filter(bool Function(dynamic) predicate, List<dynamic>list) sync*{
-   for(var x in list) {
-     if(predicate(x))yield x;
-   }
- }
-*/
-
-//using list method
-List<dynamic> filter(bool Function(dynamic) predicate, List<dynamic> list){
-  List as = [];
-  for(var x in list) {
-    if(predicate(x))as+=[x];
-  }
-  return as;
-}
-
-//****************length function
-int length(List list){
-  var count= 0;
-  for(var x in list)count++;
-  return count;
-}
-
-//*****************map function
-//BONUS tinz
-/* using iterable method
- Iterable<dynamic> map(dynamic Function(dynamic) func, List<dynamic>list) sync*{
-   for(var x in list) {
-     yield(func(x));
-   }
- }
- //DONT FORGET TO USE .toList() if Iterable method is preferred
-*/
-
-List<dynamic> map(dynamic Function(dynamic) func, List<dynamic> list){
-  List as = [];
-  for(var x in list)as+=[func(x)];
-  return as;
-}
-
-//******************reverse
-List<dynamic> reverse(List a){
-  var count = 0;
-  for(var x in a)count++;
-  for(int i = 0;i<count~/2;i++){
-    var temp = a[i];
-    a[i] = a[-1+count-i];
-    a[count-i-1] = temp;
-  }
-  return a;
-}
-
-void main() {
-  List a = [1,2,3,4];
-  List b = ['a','b','c','d'];
-  
-  //append
-  List appended = append(a,b);
-  print(appended);
-  
-  //concatenate
-  var conc = concatenate(a,b,[1,5],[12,3456,],['a',"s",12.54,'a']);
-  print(conc);
-  
-  //filter
-  List filtered = filter((x)=>x.runtimeType==int,appended);
-  print(filtered);
-  
-  //length
-  print(length(a));
-  
-  //map
-  List maps = map((x)=>x*x,a);
-  print(maps);
-  
-  //reverse
-  List reverser = reverse(appended);
-  print(reverser);
 }
