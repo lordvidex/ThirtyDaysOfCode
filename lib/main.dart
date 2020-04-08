@@ -28,21 +28,44 @@ class FirstPage extends StatefulWidget {
 
 class _FirstPageState extends State<FirstPage> with TickerProviderStateMixin {
   TabController tabController;
+  Widget myFAB;
+  Widget fabCode(IconData icon) => FloatingActionButton(
+      onPressed: () {},
+      child: Icon(
+        icon,
+        color: Colors.white,
+      ));
   @override
   void initState() {
-    tabController = TabController(initialIndex: 1, length: 4, vsync: this);
+    myFAB = fabCode(Icons.chat);
+    tabController = TabController(initialIndex: 1, length: 4, vsync: this)
+      ..addListener(() {
+        setState(() {
+          switch (tabController.index) {
+            case 0:
+              myFAB = null;
+              break;
+            case 1:
+              myFAB = fabCode(Icons.chat);
+              break;
+            case 2:
+              myFAB = fabCode(Icons.camera_alt);
+              break;
+            case 3:
+              myFAB = fabCode(Icons.add_call);
+              break;
+            default:
+              myFAB = null;
+          }
+        });
+      });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          child: Icon(
-            Icons.chat,
-            color: Colors.white,
-          )),
+      floatingActionButton: myFAB,
       body: new NestedScrollView(
         headerSliverBuilder: (ctx, isScrolled) => [
           SliverAppBar(
@@ -92,15 +115,33 @@ class CameraPage extends StatelessWidget {
 }
 
 class ChatPage extends StatelessWidget {
+  final imgUrl =
+      'https://raw.githubusercontent.com/lordvidex/ThirtyDaysOfCode/master/assets/images1.jpg';
   @override
   Widget build(BuildContext context) => ListView.separated(
-    itemCount: 50,
-    separatorBuilder: (_,__)=>Divider(),
+      itemCount: 50,
+      separatorBuilder: (_, __) => Divider(),
       itemBuilder: (ctx, i) => ListTile(
-            leading: CircleAvatar(
-                //backgroundImage: NetworkImage(''),
-
+            leading: GestureDetector(
+              onTap: () => showDialog(
+                  barrierDismissible: true,
+                  context: context,
+                  builder: (ctx) => SimpleDialog(
+                        title: Text('Friend ${i + 1}'),
+                        children: <Widget>[
+                          Hero(
+                            tag: 'allTheseBonusMarks',
+                            child: Image.network(imgUrl),
+                          ),
+                        ],
+                      )),
+              child: Hero(
+                tag: 'allTheseBonusMarks',
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(imgUrl),
                 ),
+              ),
+            ),
             title: Text('Friend ${i + 1}',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             subtitle:
