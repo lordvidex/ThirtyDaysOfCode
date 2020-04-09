@@ -179,160 +179,105 @@ class ChatPage extends StatelessWidget {
           ));
 }
 
-class StatusPage extends StatelessWidget {
+class StatusPage extends StatefulWidget {
+  @override
+  _StatusPageState createState() => _StatusPageState();
+}
+
+class _StatusPageState extends State<StatusPage> {
+  List<Widget> unreadStatuses;
+  List<Widget> readStatuses;
+  @override
+  void initState() {
+    unreadStatuses = statusGenerator(
+      false,
+    );
+    readStatuses = statusGenerator(true);
+    super.initState();
+  }
+
+  Widget myListTile(Widget leading, String title, String subtitle) => Container(
+      color: Colors.white,
+      child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ListTile(
+              leading: leading,
+              title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text(subtitle))));
   final imgUrl =
       'https://raw.githubusercontent.com/lordvidex/ThirtyDaysOfCode/master/assets/images1.jpg';
+  Widget spacer(String text) => Padding(
+        padding: const EdgeInsets.all(8),
+        child: Text(
+          text,
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+        ),
+      );
+      //dummy status items used for this task serving as server data
+List<Widget> statusGenerator(bool read) => List<Widget>.generate(5, (i) {
+      var imageUrl = read
+          ? 'https://image.spreadshirtmedia.com/image-server/v1/mp/compositions/T1196A2MPA3058PT17X15Y13D1016302346FS1822/views/1,width=550,height=550,appearanceId=2,backgroundColor=000000,noPt=true,version=1567586010/money-heist-la-casa-de-papel-womens-5050-t-shirt.jpg'
+          : 'https://upload.wikimedia.org/wikipedia/en/b/b0/OMG_%28featuring_Quavo%29_%28Official_Single_Cover%29_by_Camila_Cabello.png';
+      return myListTile(
+          CircleAvatar(
+            backgroundColor: !read ? Color(0xFF105E55) : Colors.grey,
+            radius: 30,
+            child: Container(
+              margin: EdgeInsets.all(2),
+              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(imageUrl),
+                radius: 25,
+              ),
+            ),
+          ),
+          read ? 'The Professor ${i + 1}' : 'Camila Cabello ${i + 1}',
+          read ? 'Today 5:4$i PM' : '${(i + 1) * 5} minutes ago');
+    });
+
   @override
   Widget build(BuildContext context) => Container(
-        color: Colors.grey[300],
+        color: Colors.grey[200],
         child: ListView.builder(
           padding: EdgeInsets.all(0),
           itemBuilder: (ctx, index) => index == 0
-              ? Container(
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: ListTile(
-                      leading: Stack(
-                        children: <Widget>[
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundImage: NetworkImage(imgUrl),
-                          ),
-                          Positioned(
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 20,
-                              width: 20,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Theme.of(context).accentColor,
-                              ),
-                              child: Center(
-                                  child: Icon(Icons.add,
-                                      color: Colors.white, size: 15)),
+              ? myListTile(
+                  Stack(children: <Widget>[
+                    CircleAvatar(
+                        radius: 30, backgroundImage: NetworkImage(imgUrl)),
+                    Positioned(
+                        child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Theme.of(context).accentColor,
                             ),
-                            bottom: 0,
-                            right: 1.0,
-                          ),
-                        ],
-                      ),
-                      title: Text(
-                        'My status',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      subtitle: Text(
-                        'Tap to add status update',
-                        //style: TextStyle(color: Colors.grey)
-                      ),
-                    ),
-                  ),
+                            child: Center(
+                                child: Icon(Icons.add,
+                                    color: Colors.white, size: 15)),
+                            alignment: Alignment.center,
+                            height: 20,
+                            width: 20),
+                        bottom: 0,
+                        right: 1.0)
+                  ]),
+                  'My status',
+                  'Tap to add status update',
                 )
               : index == 1
-                  ? Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(
-                        'Recent updates',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.grey),
-                      ),
-                    )
+                  ? spacer('Recent updates')
                   : index >= 2 && index < 2 + unreadStatuses.length
                       ? unreadStatuses[index - 2]
-                      : Container(),
-          itemCount: 8,
+                      : index == 2 + unreadStatuses.length
+                          ? spacer('Viewed updates')
+                          : readStatuses[index - 3 - unreadStatuses.length],
+          itemCount: unreadStatuses.length + readStatuses.length + 3,
         ),
-        // Column(
-        //   mainAxisAlignment: MainAxisAlignment.start,
-        //   crossAxisAlignment: CrossAxisAlignment.start,
-        //   children: <Widget>[
-        //     Container(
-        //       color: Colors.white,
-        //       child: Padding(
-        //         padding: const EdgeInsets.all(8),
-        //         child: ListTile(
-        //           leading: Stack(
-        //             children: <Widget>[
-        //               CircleAvatar(
-        //                 radius: 30,
-        //                 backgroundImage: NetworkImage(imgUrl),
-        //               ),
-        //               Positioned(
-        //                 child: Container(alignment: Alignment.center,
-        //                   height: 20,
-        //                   width: 20,
-        //                   decoration: BoxDecoration(
-        //                     shape: BoxShape.circle,
-        //                     color: Theme.of(context).accentColor,
-        //                   ),
-        //                   child: Center(child:Icon(Icons.add, color: Colors.white,size: 15)),
-        //                 ),
-        //                 bottom: 0,
-        //                 right: 1.0,
-        //               ),
-        //             ],
-        //           ),
-        //           title: Text(
-        //             'My status',
-        //             style: TextStyle(
-        //               fontWeight: FontWeight.bold,
-        //             ),
-        //           ),
-        //           subtitle: Text(
-        //             'Tap to add status update',
-        //             //style: TextStyle(color: Colors.grey)
-        //           ),
-        //         ),
-        //       ),
-        //     ),
-        //     Padding(
-        //       padding: const EdgeInsets.all(8),
-        //       child: Text(
-        //         'Recent updates',
-        //         style:
-        //             TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
-        //       ),
-        //     ),
-        //   ],
-        // ),
       );
 }
-
-//dummy status items used for this task serving as server data
-var unreadStatuses = List<Widget>.generate(5, (i) {
-  var imageUrl = '';
-  return Container(
-    color: Colors.white,
-    child: Padding(
-      padding: const EdgeInsets.all(8),
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(1),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Color(0xFF105E55), width: 2),
-          ),
-          child: CircleAvatar(
-            backgroundImage: NetworkImage(imageUrl),
-            radius: 30,
-          ),
-        ),
-        title: Text(
-          'Camila Cabello ${i + 1}',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(
-          '${(i + 1) * 5} minutes ago',
-          //style: TextStyle(color: Colors.grey)
-        ),
-      ),
-    ),
-  );
-});
 
 class CallsPage extends StatelessWidget {
   @override
