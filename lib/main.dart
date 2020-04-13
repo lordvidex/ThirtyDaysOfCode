@@ -8,7 +8,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ECX',
       debugShowCheckedModeBanner: false,
-      home: FirstPage(),
+      home: Scaffold(body: FirstPage()),
       theme: ThemeData.light().copyWith(
         backgroundColor: Colors.blue[300],
         accentColor: Colors.red[300],
@@ -37,14 +37,28 @@ class FirstPage extends StatefulWidget {
 class _FirstPageState extends State<FirstPage> {
   String selectedTrack;
   String date;
+  GlobalKey<FormState> _formKey;
+
   initState() {
+    _formKey = GlobalKey<FormState>();
     selectedTrack = tracks[0];
     var x = DateTime.now();
     date = '${x.hour}:${x.minute}:${x.second} ${x.day}/${x.month}/${x.year}';
     super.initState();
   }
 
-  Widget myTextField({String label, bool isDropDown = false}) {
+  void validateForm() {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    Scaffold.of(context).removeCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text('Validation passed'),
+    ));
+  }
+
+  Widget myTextField(
+      {String label, bool isDropDown = false, Function(String) valid}) {
     return Row(children: <Widget>[
       Expanded(
           child: Padding(
@@ -72,29 +86,31 @@ class _FirstPageState extends State<FirstPage> {
                       ),
                     )
                   : TextFormField(
+                      validator: valid,
                       decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      labelText: label,
-                      labelStyle: TextStyle(color: Colors.blue[200]),
-                      filled: true,
-                      alignLabelWithHint: true,
-                      border: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.yellow[200], width: 5),
-                          borderRadius: BorderRadius.all(Radius.circular(20))),
-                    ))))
+                        fillColor: Colors.white,
+                        labelText: label,
+                        labelStyle: TextStyle(color: Colors.blue[200]),
+                        filled: true,
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.yellow[200], width: 5),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                      ))))
     ]);
   }
 
-  Widget myButton(text) {
+  Widget myButton(String text, Function validator) {
     return Row(
       children: <Widget>[
         Expanded(
           child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(20),
+              child: GestureDetector(
+                  onTap: validator,
+                  //borderRadius: BorderRadius.circular(20),
                   child: Container(
                     alignment: Alignment.center,
                     constraints: BoxConstraints(minHeight: 50),
@@ -146,35 +162,51 @@ class _FirstPageState extends State<FirstPage> {
                   vertical: 20,
                 ),
                 child: SingleChildScrollView(
-                    child: Column(children: <Widget>[
-                  myTextField(label: 'Enter your Email address'),
-                  SizedBox(height: 20),
-                  myTextField(label: 'Enter Matric No'),
-                  SizedBox(height: 20),
-                  myTextField(label: 'Select Track', isDropDown: true),
-                  SizedBox(height: 20),
-                  Row(children: <Widget>[
-                    Expanded(
-                        child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 18),
-                            child: InputDecorator(
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Colors.grey[200],
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20))),
-                              ),
-                              child: Text('Date Submitted: $date',
-                                  style: TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                    color: Colors.red[200],
-                                  )),
-                            )))
+                    child: Form(
+                  key: _formKey,
+                  child: Column(children: <Widget>[
+                    myTextField(
+                        label: 'Enter your Email address',
+                        valid: (s) {
+                          if (RegExp(r'\S+@+\S+\.+\S+').stringMatch(s) != s)
+                            return 'Invalid Email address';
+                          return null;
+                        }),
+                    SizedBox(height: 20),
+                    myTextField(
+                        label: 'Enter Matric No',
+                        valid: (s) {
+                          if (s.length != 9 || s.contains(new RegExp(r'\D')))
+                            return 'Invalid Matric number';
+                          return null;
+                        }),
+                    SizedBox(height: 20),
+                    myTextField(label: 'Select Track', isDropDown: true),
+                    SizedBox(height: 20),
+                    Row(children: <Widget>[
+                      Expanded(
+                          child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 18),
+                              child: InputDecorator(
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.grey[200],
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20))),
+                                ),
+                                child: Text('Date Submitted: $date',
+                                    style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.red[200],
+                                    )),
+                              )))
+                    ]),
+                    SizedBox(height: 20),
+                    myButton('Submit Attendance', validateForm),
                   ]),
-                  SizedBox(height: 20),
-                  myButton('Submit Attendance'),
-                ])))),
+                )))),
       ]),
     );
   }
