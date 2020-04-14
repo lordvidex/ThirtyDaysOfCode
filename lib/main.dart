@@ -8,8 +8,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ECX',
       debugShowCheckedModeBanner: false,
-      home: Scaffold(body: FirstPage()),
+      home: FirstPage(),
+      routes:{
+        NewPage.routeName:(_)=>NewPage(),
+      },
       theme: ThemeData.light().copyWith(
+        appBarTheme: AppBarTheme(color: Colors.blue),
         backgroundColor: Colors.blue[300],
         accentColor: Colors.red[300],
         scaffoldBackgroundColor: Colors.blue[300],
@@ -51,10 +55,7 @@ class _FirstPageState extends State<FirstPage> {
     if (!_formKey.currentState.validate()) {
       return;
     }
-    Scaffold.of(context).removeCurrentSnackBar();
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text('Validation passed'),
-    ));
+    Navigator.of(context).pushNamed(NewPage.routeName);
   }
 
   Widget myTextField(
@@ -208,6 +209,17 @@ class _FirstPageState extends State<FirstPage> {
                   ]),
                 )))),
       ]),
+    );
+  }
+}
+class NewPage extends StatelessWidget{
+  static const routeName = '/new';
+  @override
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar:AppBar(title: Text('Confirmation Page')
+      ),
+      body: Center(child: Text('Attendance Submitted!',style: Theme.of(context).textTheme.headline2))
     );
   }
 }
