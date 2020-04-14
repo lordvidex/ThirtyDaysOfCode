@@ -2,14 +2,23 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
 
+class Data{
+  String email;
+  String matric;
+  String track;
+  String date;
+  Data(this.email,this.matric,this.track,this.date);
+}
+Data myData;
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp(initialRoute: '/first',
       title: 'ECX',
       debugShowCheckedModeBanner: false,
       home: FirstPage(),
       routes:{
+        FirstPage.routeName:(_)=>FirstPage(),
         NewPage.routeName:(_)=>NewPage(),
       },
       theme: ThemeData.light().copyWith(
@@ -34,6 +43,7 @@ List tracks = [
 ];
 
 class FirstPage extends StatefulWidget {
+  static const routeName = '/first';
   @override
   _FirstPageState createState() => _FirstPageState();
 }
@@ -41,9 +51,17 @@ class FirstPage extends StatefulWidget {
 class _FirstPageState extends State<FirstPage> {
   String selectedTrack;
   String date;
+  TextEditingController t1;
+  TextEditingController t2;
   GlobalKey<FormState> _formKey;
-
+  dispose(){
+    t1.dispose();
+    t2.dispose();
+    super.dispose();
+  }
   initState() {
+    t1 = new TextEditingController();
+    t2 = TextEditingController();
     _formKey = GlobalKey<FormState>();
     selectedTrack = tracks[0];
     var x = DateTime.now();
@@ -55,10 +73,12 @@ class _FirstPageState extends State<FirstPage> {
     if (!_formKey.currentState.validate()) {
       return;
     }
-    Navigator.of(context).pushNamed(NewPage.routeName);
+    var data = new Data(t1.text,t2.text,selectedTrack,date);
+    myData = data;
+    Navigator.of(context).pushNamed(NewPage.routeName,arguments: data);
   }
 
-  Widget myTextField(
+  Widget myTextField(TextEditingController controller,
       {String label, bool isDropDown = false, Function(String) valid}) {
     return Row(children: <Widget>[
       Expanded(
@@ -87,6 +107,7 @@ class _FirstPageState extends State<FirstPage> {
                       ),
                     )
                   : TextFormField(
+                    controller: controller,
                       validator: valid,
                       decoration: InputDecoration(
                         fillColor: Colors.white,
@@ -166,7 +187,7 @@ class _FirstPageState extends State<FirstPage> {
                     child: Form(
                   key: _formKey,
                   child: Column(children: <Widget>[
-                    myTextField(
+                    myTextField(t1,
                         label: 'Enter your Email address',
                         valid: (s) {
                           if (RegExp(r'\S+@+\S+\.+\S+').stringMatch(s) != s)
@@ -174,7 +195,7 @@ class _FirstPageState extends State<FirstPage> {
                           return null;
                         }),
                     SizedBox(height: 20),
-                    myTextField(
+                    myTextField(t2,
                         label: 'Enter Matric No',
                         valid: (s) {
                           if (s.length != 9 || s.contains(new RegExp(r'\D')))
@@ -182,7 +203,7 @@ class _FirstPageState extends State<FirstPage> {
                           return null;
                         }),
                     SizedBox(height: 20),
-                    myTextField(label: 'Select Track', isDropDown: true),
+                    myTextField(null,label: 'Select Track', isDropDown: true),
                     SizedBox(height: 20),
                     Row(children: <Widget>[
                       Expanded(
@@ -212,14 +233,40 @@ class _FirstPageState extends State<FirstPage> {
     );
   }
 }
-class NewPage extends StatelessWidget{
+class NewPage extends StatefulWidget{
+  
   static const routeName = '/new';
+  _NewPageState createState()=>_NewPageState();
+}
+class _NewPageState extends State<NewPage>{
   @override
   Widget build(BuildContext context){
+    Data data = ModalRoute.of(context).settings.arguments as Data;
+    Widget textB(String title, String dat){
+    return RichText(text: TextSpan(
+            text: '$title: ',
+            style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),
+            children: [
+              TextSpan(text: dat,style: TextStyle(color: Colors.white))
+            ]
+          ),);
+  }
     return Scaffold(
       appBar:AppBar(title: Text('Confirmation Page')
       ),
-      body: Center(child: Text('Attendance Submitted!',style: Theme.of(context).textTheme.headline2))
-    );
+      body: Center(child:SingleChildScrollView(child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment:CrossAxisAlignment.center,
+        children:(data==null)?[
+          Text('Error Occured'),
+          RaisedButton(child: Text('Re-Submit attendance'),onPressed: ()=>Navigator.of(context).pushReplacementNamed(FirstPage.routeName),)
+        ]:[
+          textB('Email',data.email),
+          textB('Matric No',data.matric),
+           textB('Track',data.track),
+           textB('Date and Time Submitted',data.date),
+        ]
+      ))
+    ));
   }
 }
