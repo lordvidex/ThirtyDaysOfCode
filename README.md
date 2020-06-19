@@ -1,4 +1,4 @@
-# practice
+# Thirty Days of Code app
 
 A new Flutter project.
 
